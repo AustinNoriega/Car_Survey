@@ -9,16 +9,10 @@ st.title("Welcome to a Car Enthusiast's Survey.")
 st.markdown("**Please fill out all of the information below :D**")
 
 
-con = st.connection('gsheets', type= 'GSheetsConnection')
+con = st.connection("gsheets", type=GSheetsConnection)
 current= con.read(worksheet='Data')
 
 #creating fields to choose from
-ideals = ['Horsepower',
-          'Track Times',
-          'Track Additions (Track Suspension, Carbon Ceramic Breaks, etc...)',
-          'Lightweight',
-          'Aerodynamics']
-
 age_ranges = ['<18',
               '18-30',
               '30-45',
@@ -43,7 +37,7 @@ with st.form(key='Car_survey'):
             st.warning("Please fill out all of the information ")
         else:
             st.write("Thanks for submitting!")
-            new_data = pd.Dataframe(
+            new_data = pd.DataFrame(
                 [
                     {
                     'City': city,
@@ -61,5 +55,5 @@ with st.form(key='Car_survey'):
                 ]
             )
             updated = pd.concat([new_data, current], ignore_index=True)
-            con.update('Data', updated)
+            con.update(worksheet='Data', data= updated)
             st.success("Yippie")
