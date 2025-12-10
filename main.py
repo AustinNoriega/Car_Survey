@@ -1,5 +1,5 @@
 import streamlit as st
-from sqlalchemy.sql import text
+from streamlit_gsheets import GSheetsConnection
 import numpy as np
 
 #title
@@ -7,9 +7,10 @@ st.title("Welcome to a Car Enthusiast's Survey.")
 st.markdown("**Please fill out all of the information below :D**")
 
 
-con = st.connection('Data_db', type= 'sql')
+con = st.connection('gsheets', type= 'GSheetsConnection')
+current= con.read(worksheet='Data')
 
-#creating fields to chose from
+#creating fields to choose from
 ideals = ['Horsepower',
           'Track Times',
           'Track Additions (Track Suspension, Carbon Ceramic Breaks, etc...)',
@@ -40,7 +41,23 @@ with st.form(key='Car_survey'):
             st.warning("Please fill out all of the information ")
         else:
             st.write("Thanks for submitting!")
-            with con.session as s:
-                s.execute(text("INSERT INTO cars (City, State, Age, Speed, Handling, Visual, Feeling, Project_idea, New_car,Cost_for_new) VALUES (:city, :state, :age, :speed, :handling, :visual, :feeling, :project_idea, :new_car, :cost_for_new);"),
-                    params = dict(city = city, state = state, age = age, speed = speed, handling = handling, visual = visuals, feeling = feel, project_idea = project_ideas, cost_for_new = cost,  new_car = new_car)),
-                s.commit()
+            new_data = pd.Dataframe(
+                [
+                    {
+                    'City': city,
+                    'State': state,
+                    'Age': age,
+                    'Speed': speed,
+                    'Handling': handling,
+                    'Visual': visuals,
+                    'Feeling': feel,
+                    'Project_idea': project_ideas,
+                    'New_Car': new_car,
+                    'Cost_for_new': cost,
+
+                    }
+                ]
+            )
+            updated = pd.concat([new_data, current], ignore_index=True)
+            con.update('Data', updated)
+            st.success("Yippie")
