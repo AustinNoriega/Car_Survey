@@ -57,3 +57,4 @@ with st.form(key='Car_survey'):
             updated = pd.concat([current, new_data], ignore_index=True)
             con.update(worksheet = 'Data', data = updated)
             st.success("Yippie")
+            st.cache_data.clear()
